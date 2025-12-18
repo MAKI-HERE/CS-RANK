@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire Booyah Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 3px solid #ff4757;
+            position: relative;
+        }
+        
+        h1 {
+            color: #ffd700;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #70a1ff;
+            font-size: 0.9rem;
+        }
+        
+        .github-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ed573;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .rate-card {
+            background: rgba(255, 71, 87, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 15px 0;
+            border: 2px solid #ff4757;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #70a1ff;
+            margin-top: 5px;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #2ed573, #1dd1a1);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ffd700, #f39c12);
+            color: black;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #3742fa, #5352ed);
+            color: white;
+        }
+        
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 300px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .session-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ff4757;
+        }
+        
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .session-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+        
+        .stars-display {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        .amount-display {
+            color: #2ed573;
+            font-weight: bold;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-paid {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid #2ed573;
+        }
+        
+        .status-unpaid {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+        }
+        
+        .action-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .icon-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .player-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .player-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .player-card h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .player-info {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 20px auto;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 500px;
+            border: 3px solid #ff4757;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ff4757;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff4757;
+        }
+        
+        .star-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .star-arrow {
+            color: #ffd700;
+            font-size: 1.5rem;
+        }
+        
+        .stars-result {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px dashed #ffd700;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .save-notice {
+            background: rgba(46, 213, 115, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 15px;
+            border: 1px solid #2ed573;
+            display: none;
+        }
+        
+        .backup-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            border-top: 2px solid #ff4757;
+        }
+        
+        .backup-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .export-btn {
+            background: #3742fa;
+            color: white;
+        }
+        
+        .import-btn {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .github-link {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .github-link a {
+            color: #70a1ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .player-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .backup-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="github-status">
+                <div class="status-dot"></div>
+                <span>Auto-Save ON</span>
+            </div>
+            <h1>🎮 FREE FIRE BOOYAH TRACKER</h1>
+            <p class="subtitle">Track Classic Squad Wins • ₹4 Per Booyah • Never Miss Payments</p>
+        </header>
+        
+        <div class="rate-card">
+            💰 RATE: <span style="color:#ffd700;">₹4 PER BOOYAH</span> • 💫 PER STAR
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="todayEarnings">₹0</div>
+                <div class="stat-label">Today's Earnings</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="totalEarnings">₹0</div>
+                <div class="stat-label">Total Earnings</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="pendingAmount">₹0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="todayStars">0</div>
+                <div class="stat-label">Today's Booyahs</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="openSessionModal()">
+                🎮 Add Session
+            </button>
+            <button class="btn btn-success" onclick="openPlayerModal()">
+                👤 Add Player
+            </button>
+            <button class="btn btn-warning" onclick="showTodayReport()">
+                📊 Today's Report
+            </button>
+            <button class="btn btn-secondary" onclick="openBackupModal()">
+                💾 Backup
+            </button>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="today">Today</div>
+            <div class="tab" data-tab="players">Players</div>
+            <div class="tab" data-tab="pending">Pending</div>
+        </div>
+        
+        <div id="today-tab" class="tab-content active">
+            <h3 style="color:#ffd700; margin-bottom:15px;">Today's Sessions</h3>
+            <div id="todaySessionsList">
+                <!-- Today's sessions will appear here -->
+            </div>
+        </div>
+        
+        <div id="players-tab" class="tab-content">
+            <h3 style="color:#ffd700; margin-bottom:15px;">All Players</h3>
+            <div id="playersList" class="player-list">
+                <!-- Players will appear here -->
+            </div>
+        </div>
+        
+        <div id="pending-tab" class="tab-content">
+            <h3 style="color:#ffd700; margin-bottom:15px;">Pending Payments</h3>
+            <div id="pendingList">
+                <!-- Pending payments will appear here -->
+            </div>
+        </div>
+        
+        <div class="github-link">
+            🔒 <strong>Data Auto-Saves</strong> • No Account Needed • Works Offline
+        </div>
+    </div>
+    
+    <!-- Session Modal -->
+    <div id="sessionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#ffd700;">🎮 Add Booyah Session</h2>
+                <button class="close-btn" onclick="closeModal('sessionModal')">×</button>
+            </div>
+            <form id="sessionForm">
+                <div class="form-group">
+                    <label>Player</label>
+                    <select id="playerSelect" required>
+                        <option value="">Select Player</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Stars Progress</label>
+                    <div class="star-inputs">
+                        <input type="number" id="startStars" placeholder="Start" min="0" required>
+                        <div class="star-arrow">→</div>
+                        <input type="number" id="endStars" placeholder="End" min="0" required>
+                    </div>
+                </div>
+                
+                <div id="starsResult" class="stars-result">
+                    Calculated: 0 Booyahs = ₹0
+                </div>
+                
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="sessionDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Payment Status</label>
+                    <select id="paymentStatus">
+                        <option value="unpaid">❌ Not Paid</option>
+                        <option value="paid">✅ Paid</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:1.1rem;">
+                    💾 Save Session
+                </button>
+            </form>
+            <div id="saveNotice" class="save-notice">
+                ✅ Session saved successfully!
+            </div>
+        </div>
+    </div>
+    
+    <!-- Player Modal -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#ffd700;">👤 Add New Player</h2>
+                <button class="close-btn" onclick="closeModal('playerModal')">×</button>
+            </div>
+            <form id="playerForm">
+                <div class="form-group">
+                    <label>Player Name (Free Fire ID)</label>
+                    <input type="text" id="playerName" placeholder="Enter player name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contact (WhatsApp/Phone)</label>
+                    <input type="text" id="playerContact" placeholder="Optional">
+                </div>
+                
+                <div class="form-group">
+                    <label>Rate per Booyah (₹)</label>
+                    <input type="number" id="playerRate" value="4" min="1" max="100">
+                </div>
+                
+                <button type="submit" class="btn btn-success" style="width:100%; padding:15px; font-size:1.1rem;">
+                    ✅ Add Player
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Backup Modal -->
+    <div id="backupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#ffd700;">💾 Backup & Restore</h2>
+                <button class="close-btn" onclick="closeModal('backupModal')">×</button>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-bottom:20px;">
+                <h3 style="color:#ffd700; margin-bottom:10px;">📤 Export Data</h3>
+                <p style="margin-bottom:15px; color:#ccc;">Download all your data as a backup file.</p>
+                <button onclick="exportData()" class="btn btn-primary" style="width:100%; padding:15px;">
+                    ⬇️ Download Backup File
+                </button>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-bottom:20px;">
+                <h3 style="color:#ffd700; margin-bottom:10px;">📥 Import Data</h3>
+                <p style="margin-bottom:15px; color:#ccc;">Restore from a backup file.</p>
+                <input type="file" id="importFile" accept=".json" style="margin-bottom:15px;">
+                <button onclick="importData()" class="btn btn-success" style="width:100%; padding:15px;">
+                    ⬆️ Upload & Restore
+                </button>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px;">
+                <h3 style="color:#ffd700; margin-bottom:10px;">⚠️ Clear All Data</h3>
+                <p style="margin-bottom:15px; color:#ccc;">Permanently delete all data.</p>
+                <button onclick="clearAllData()" class="btn" style="width:100%; padding:15px; background:#ff4757; color:white;">
+                    🗑️ Clear Everything
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="backup-buttons">
+        <button class="backup-btn export-btn" onclick="exportData()">
+            💾 Export Data
+        </button>
+        <button class="backup-btn import-btn" onclick="document.getElementById('importFile').click()">
+            📥 Import Data
+        </button>
+    </div>
+
+    <script>
+        // Data Management
+        let players = JSON.parse(localStorage.getItem('ffPlayers')) || [];
+        let sessions = JSON.parse(localStorage.getItem('ffSessions')) || [];
+        const RATE_PER_BOOYAH = 4;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('sessionDate').value = today;
+            
+            // Setup event listeners
+            document.getElementById('sessionForm').addEventListener('submit', saveSession);
+            document.getElementById('playerForm').addEventListener('submit', savePlayer);
+            document.getElementById('startStars').addEventListener('input', calculateStars);
+            document.getElementById('endStars').addEventListener('input', calculateStars);
+            
+            // Setup tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Initialize data
+            loadPlayerSelect();
+            updateAllDisplays();
+            
+            // Auto-save reminder
+            setInterval(() => {
+                saveToLocalStorage();
+            }, 30000); // Auto-save every 30 seconds
+        });
+        
+        // Tab switching
+        function switchTab(tabId) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId + '-tab').classList.add('active');
+        }
+        
+        // Calculate stars
+        function calculateStars() {
+            const start = parseInt(document.getElementById('startStars').value) || 0;
+            const end = parseInt(document.getElementById('endStars').value) || 0;
+            const gained = Math.max(0, end - start);
+            const amount = gained * RATE_PER_BOOYAH;
+            document.getElementById('starsResult').innerHTML = 
+                `🎯 ${gained} Booyahs = ₹${amount}`;
+        }
+        
+        // Modals
+        function openSessionModal() {
+            loadPlayerSelect();
+            calculateStars();
+            document.getElementById('sessionModal').style.display = 'block';
+        }
+        
+        function openPlayerModal() {
+            document.getElementById('playerModal').style.display = 'block';
+        }
+        
+        function openBackupModal() {
+            document.getElementById('backupModal').style.display = 'block';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Load player select
+        function loadPlayerSelect() {
+            const select = document.getElementById('playerSelect');
+            select.innerHTML = '<option value="">Select Player</option>';
+            
+            players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = `${player.name} (₹${player.rate || RATE_PER_BOOYAH}/Booyah)`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Save session
+        function saveSession(e) {
+            e.preventDefault();
+            
+            const playerId = document.getElementById('playerSelect').value;
+            const startStars = parseInt(document.getElementById('startStars').value) || 0;
+            const endStars = parseInt(document.getElementById('endStars').value) || 0;
+            const date = document.getElementById('sessionDate').value;
+            const paid = document.getElementById('paymentStatus').value === 'paid';
+            
+            if (!playerId) {
+                alert('Please select a player!');
+                return;
+            }
+            
+            if (endStars < startStars) {
+                alert('End stars cannot be less than start stars!');
+                return;
+            }
+            
+            const player = players.find(p => p.id === playerId);
+            const starsGained = endStars - startStars;
+            const playerRate = player?.rate || RATE_PER_BOOYAH;
+            const amount = starsGained * playerRate;
+            
+            const session = {
+                id: Date.now().toString(),
+                playerId: playerId,
+                playerName: player?.name || 'Unknown',
+                date: date,
+                startStars: startStars,
+                endStars: endStars,
+                starsGained: starsGained,
+                amount: amount,
+                paid: paid,
+                createdAt: new Date().toISOString()
+            };
+            
+            sessions.push(session);
+            saveToLocalStorage();
+            
+            // Show success message
+            const notice = document.getElementById('saveNotice');
+            notice.style.display = 'block';
+            setTimeout(() => {
+                notice.style.display = 'none';
+            }, 2000);
+            
+            // Reset form
+            setTimeout(() => {
+                document.getElementById('sessionForm').reset();
+                document.getElementById('sessionDate').value = new Date().toISOString().split('T')[0];
+                calculateStars();
+            }, 500);
+            
+            // Update displays
+            setTimeout(() => {
+                updateAllDisplays();
+            }, 100);
+        }
+        
+        // Save player
+        function savePlayer(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('playerName').value.trim();
+            const contact = document.getElementById('playerContact').value.trim();
+            const rate = parseInt(document.getElementById('playerRate').value) || RATE_PER_BOOYAH;
+            
+            if (!name) {
+                alert('Please enter player name!');
+                return;
+            }
+            
+            if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+                alert('Player already exists!');
+                return;
+            }
+            
+            const player = {
+                id: Date.now().toString(),
+                name: name,
+                contact: contact,
+                rate: rate,
+                totalStars: 0,
+                totalAmount: 0,
+                totalPaid: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            players.push(player);
+            saveToLocalStorage();
+            
+            // Reset and close
+            document.getElementById('playerForm').reset();
+            closeModal('playerModal');
+            
+            // Update
+            loadPlayerSelect();
+            updateAllDisplays();
+            
+            alert(`✅ Player added: ${name}`);
+        }
+        
+        // Update all displays
+        function updateAllDisplays() {
+            updateStats();
+            updateTodaySessions();
+            updatePlayersList();
+            updatePendingList();
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            let todayEarnings = 0;
+            let todayStars = 0;
+            let totalEarnings = 0;
+            let pendingAmount = 0;
+            
+            sessions.forEach(session => {
+                totalEarnings += session.amount;
+                
+                if (!session.paid) {
+                    pendingAmount += session.amount;
+                }
+                
+                if (session.date === today) {
+                    todayEarnings += session.amount;
+                    todayStars += session.starsGained;
+                }
+            });
+            
+            document.getElementById('todayEarnings').textContent = `₹${todayEarnings}`;
+            document.getElementById('totalEarnings').textContent = `₹${totalEarnings}`;
+            document.getElementById('pendingAmount').textContent = `₹${pendingAmount}`;
+            document.getElementById('todayStars').textContent = todayStars;
+        }
+        
+        // Update today's sessions
+        function updateTodaySessions() {
+            const today = new Date().toISOString().split('T')[0];
+            const todaySessions = sessions.filter(s => s.date === today);
+            const container = document.getElementById('todaySessionsList');
+            
+            if (todaySessions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:#ccc;">
+                        🎮 No sessions today<br>
+                        <small>Add your first Booyah session!</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            todaySessions.forEach(session => {
+                const div = document.createElement('div');
+                div.className = 'session-item';
+                div.innerHTML = `
+                    <div class="session-header">
+                        <div class="player-name">${session.playerName}</div>
+                        <div class="status-badge ${session.paid ? 'status-paid' : 'status-unpaid'}">
+                            ${session.paid ? '✅ Paid' : '❌ Unpaid'}
+                        </div>
+                    </div>
+                    <div style="color:#ccc; font-size:0.9rem;">
+                        ${session.startStars} → ${session.endStars} stars
+                    </div>
+                    <div class="session-stats">
+                        <div class="stars-display">${session.starsGained} Booyahs</div>
+                        <div class="amount-display">₹${session.amount}</div>
+                    </div>
+                    <div class="action-icons">
+                        <button class="icon-btn" onclick="togglePayment('${session.id}')" 
+                                style="background:${session.paid ? '#ff4757' : '#2ed573'}; color:white;">
+                            ${session.paid ? '❌ Unpaid' : '✅ Paid'}
+                        </button>
+                        <button class="icon-btn" onclick="deleteSession('${session.id}')" 
+                                style="background:#3742fa; color:white;">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        // Update players list
+        function updatePlayersList() {
+            const container = document.getElementById('playersList');
+            
+            if (players.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:#ccc; grid-column:1/-1;">
+                        👤 No players yet<br>
+                        <small>Add your first player!</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calculate player stats
+            players.forEach(player => {
+                player.totalStars = 0;
+                player.totalAmount = 0;
+                player.totalPaid = 0;
+            });
+            
+            sessions.forEach(session => {
+                const player = players.find(p => p.id === session.playerId);
+                if (player) {
+                    player.totalStars += session.starsGained;
+                    player.totalAmount += session.amount;
+                    if (session.paid) {
+                        player.totalPaid += session.amount;
+                    }
+                }
+            });
+            
+            container.innerHTML = '';
+            players.forEach(player => {
+                const pending = player.totalAmount - player.totalPaid;
+                const div = document.createElement('div');
+                div.className = 'player-card';
+                div.innerHTML = `
+                    <h4>${player.name}</h4>
+                    <div class="player-info">
+                        <div>📞 ${player.contact || 'No contact'}</div>
+                        <div>💰 Rate: ₹${player.rate || RATE_PER_BOOYAH}/Booyah</div>
+                        <div>⭐ Total: ${player.totalStars} Booyahs</div>
+                        <div>💵 Earned: ₹${player.totalAmount}</div>
+                        <div style="color:${pending > 0 ? '#ff4757' : '#2ed573'}; margin-top:10px; font-weight:bold;">
+                            ${pending > 0 ? `❌ ₹${pending} Pending` : '✅ All Paid'}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        // Update pending list
+        function updatePendingList() {
+            const pendingSessions = sessions.filter(s => !s.paid && s.amount > 0);
+            const container = document.getElementById('pendingList');
+            
+            if (pendingSessions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:#ccc;">
+                        🎉 No pending payments!<br>
+                        <small>All cleared up!</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            pendingSessions.forEach(session => {
+                const daysAgo = Math.floor((new Date() - new Date(session.createdAt)) / (1000 * 60 * 60 * 24));
+                const div = document.createElement('div');
+                div.className = 'session-item';
+                div.style.borderLeftColor = '#ff4757';
+                div.innerHTML = `
+                    <div class="session-header">
+                        <div class="player-name">${session.playerName}</div>
+                        <div style="color:#ccc; font-size:0.8rem;">
+                            ${daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}
+                        </div>
+                    </div>
+                    <div style="color:#ccc; font-size:0.9rem; margin:8px 0;">
+                        ${session.startStars} → ${session.endStars} = ${session.starsGained} Booyahs
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="color:#ffd700; font-weight:bold; font-size:1.2rem;">
+                            ₹${session.amount}
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="remindPlayer('${session.playerId}')" 
+                                    style="padding:8px 15px; background:#3742fa; color:white; border:none; border-radius:5px; cursor:pointer;">
+                                🔔 Remind
+                            </button>
+                            <button onclick="togglePayment('${session.id}')" 
+                                    style="padding:8px 15px; background:#2ed573; color:white; border:none; border-radius:5px; cursor:pointer;">
+                                ✅ Paid
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        // Toggle payment
+        function togglePayment(sessionId) {
+            const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+            if (sessionIndex === -1) return;
+            
+            sessions[sessionIndex].paid = !sessions[sessionIndex].paid;
+            saveToLocalStorage();
+            updateAllDisplays();
+            
+            const status = sessions[sessionIndex].paid ? 'paid' : 'unpaid';
+            alert(`Payment marked as ${status}`);
+        }
+        
+        // Delete session
+        function deleteSession(sessionId) {
+            if (confirm('Delete this session permanently?')) {
+                sessions = sessions.filter(s => s.id !== sessionId);
+                saveToLocalStorage();
+                updateAllDisplays();
+                alert('Session deleted');
+            }
+        }
+        
+        // Remind player
+        function remindPlayer(playerId) {
+            const player = players.find(p => p.id === playerId);
+            if (!player) return;
+            
+            const playerSessions = sessions.filter(s => s.playerId === playerId && !s.paid);
+            let totalAmount = 0;
+            let totalBooyahs = 0;
+            
+            playerSessions.forEach(session => {
+                totalAmount += session.amount;
+                totalBooyahs += session.starsGained;
+            });
+            
+            const message = `Hi ${player.name}! Just a friendly reminder for ₹${totalAmount} for ${totalBooyahs} Booyahs. Please clear when possible. Thanks!`;
+            
+            alert(`📱 Copy this message and send via WhatsApp:\n\n${message}`);
+        }
+        
+        // Show today's report
+        function showTodayReport() {
+            const today = new Date().toISOString().split('T')[0];
+            const todaySessions = sessions.filter(s => s.date === today);
+            
+            let report = `📊 TODAY'S REPORT (${today})\n\n`;
+            
+            if (todaySessions.length === 0) {
+                report += "No sessions today.\n";
+            } else {
+                todaySessions.forEach(session => {
+                    report += `🎮 ${session.playerName}: ${session.starsGained} Booyahs = ₹${session.amount} ${session.paid ? '✅' : '❌'}\n`;
+                });
+                
+                const totalStars = todaySessions.reduce((sum, s) => sum + s.starsGained, 0);
+                const totalAmount = todaySessions.reduce((sum, s) => sum + s.amount, 0);
+                const paidAmount = todaySessions.filter(s => s.paid).reduce((sum, s) => sum + s.amount, 0);
+                
+                report += `\n📈 TOTAL: ${totalStars} Booyahs = ₹${totalAmount}\n`;
+                report += `💰 RECEIVED: ₹${paidAmount}\n`;
+                report += `📉 PENDING: ₹${totalAmount - paidAmount}\n`;
+            }
+            
+            alert(report);
+        }
+        
+        // Export data
+        function exportData() {
+            const data = {
+                players: players,
+                sessions: sessions,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `freefire-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Data exported successfully!');
+        }
+        
+        // Import data
+        function importData() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a backup file first!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm('Replace all current data with backup?')) {
+                        players = data.players || [];
+                        sessions = data.sessions || [];
+                        saveToLocalStorage();
+                        updateAllDisplays();
+                        alert('✅ Data restored successfully!');
+                    }
+                } catch (error) {
+                    alert('❌ Invalid backup file!');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            if (confirm('⚠️ DELETE ALL DATA? This cannot be undone!')) {
+                if (confirm('Are you REALLY sure? All players and sessions will be lost!')) {
+                    localStorage.removeItem('ffPlayers');
+                    localStorage.removeItem('ffSessions');
+                    players = [];
+                    sessions = [];
+                    updateAllDisplays();
+                    alert('All data cleared!');
+                    closeModal('backupModal');
+                }
+            }
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('ffPlayers', JSON.stringify(players));
+            localStorage.setItem('ffSessions', JSON.stringify(sessions));
+        }
+    </script>
+</body>
+</html>
