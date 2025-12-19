@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Fire Booyah Tracker</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         * {
             margin: 0;
@@ -47,34 +46,7 @@
             font-size: 0.9rem;
         }
         
-        .github-status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #2ed573;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        
-        .rate-card {
+        .rate-display {
             background: rgba(255, 71, 87, 0.2);
             padding: 15px;
             border-radius: 10px;
@@ -153,6 +125,11 @@
         
         .btn-secondary {
             background: linear-gradient(45deg, #3742fa, #5352ed);
+            color: white;
+        }
+        
+        .btn-info {
+            background: linear-gradient(45deg, #3498db, #2980b9);
             color: white;
         }
         
@@ -372,6 +349,56 @@
             color: #ffd700;
         }
         
+        .discount-section {
+            background: rgba(52, 152, 219, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px solid #3498db;
+        }
+        
+        .calculator-section {
+            background: rgba(155, 89, 182, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px solid #9b59b6;
+        }
+        
+        .calculator-inputs {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .calc-result {
+            text-align: center;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 2px solid #2ecc71;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        
+        .paused-session {
+            background: rgba(243, 156, 18, 0.2);
+            border-left-color: #f39c12;
+        }
+        
+        .paused-badge {
+            background: rgba(243, 156, 18, 0.3);
+            color: #f39c12;
+            border: 1px solid #f39c12;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
         .save-notice {
             background: rgba(46, 213, 115, 0.2);
             padding: 10px;
@@ -416,20 +443,6 @@
             color: white;
         }
         
-        .github-link {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-        
-        .github-link a {
-            color: #70a1ff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        
         @media (max-width: 600px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -446,22 +459,22 @@
             .backup-buttons {
                 flex-direction: column;
             }
+            
+            .calculator-inputs {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="github-status">
-                <div class="status-dot"></div>
-                <span>Auto-Save ON</span>
-            </div>
             <h1>🎮 FREE FIRE BOOYAH TRACKER</h1>
-            <p class="subtitle">Track Classic Squad Wins • ₹4 Per Booyah • Never Miss Payments</p>
+            <p class="subtitle">Track Classic Squad Wins • Flexible Pricing • Session Pause/Resume</p>
         </header>
         
-        <div class="rate-card">
-            💰 RATE: <span style="color:#ffd700;">₹4 PER BOOYAH</span> • 💫 PER STAR
+        <div class="rate-display">
+            💰 BASE RATE: <span style="color:#ffd700;">₹4 PER BOOYAH</span> • ⏸️ PAUSE/RESUME • 💸 DISCOUNTS
         </div>
         
         <div class="stats-grid">
@@ -490,11 +503,11 @@
             <button class="btn btn-success" onclick="openPlayerModal()">
                 👤 Add Player
             </button>
-            <button class="btn btn-warning" onclick="showTodayReport()">
-                📊 Today's Report
+            <button class="btn btn-warning" onclick="openResumeModal()">
+                ⏯️ Resume Session
             </button>
-            <button class="btn btn-secondary" onclick="openBackupModal()">
-                💾 Backup
+            <button class="btn btn-info" onclick="openCalculatorModal()">
+                🧮 Calculator
             </button>
         </div>
         
@@ -502,6 +515,7 @@
             <div class="tab active" data-tab="today">Today</div>
             <div class="tab" data-tab="players">Players</div>
             <div class="tab" data-tab="pending">Pending</div>
+            <div class="tab" data-tab="paused">⏸️ Paused</div>
         </div>
         
         <div id="today-tab" class="tab-content active">
@@ -525,8 +539,11 @@
             </div>
         </div>
         
-        <div class="github-link">
-            🔒 <strong>Data Auto-Saves</strong> • No Account Needed • Works Offline
+        <div id="paused-tab" class="tab-content">
+            <h3 style="color:#ffd700; margin-bottom:15px;">Paused Sessions</h3>
+            <div id="pausedList">
+                <!-- Paused sessions will appear here -->
+            </div>
         </div>
     </div>
     
@@ -558,6 +575,23 @@
                     Calculated: 0 Booyahs = ₹0
                 </div>
                 
+                <div class="discount-section">
+                    <h4 style="color:#3498db; margin-bottom:10px;">💰 Flexible Pricing</h4>
+                    <div class="form-group">
+                        <label>Custom Rate (₹ per Booyah)</label>
+                        <input type="number" id="customRate" placeholder="Leave empty for default ₹4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Discount % (if any)</label>
+                        <input type="number" id="discountPercent" min="0" max="100" placeholder="e.g., 10 for 10% off">
+                    </div>
+                    
+                    <div id="finalAmount" style="color:#2ecc71; font-weight:bold; text-align:center; margin-top:10px;">
+                        Final Amount: ₹0
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label>Date</label>
                     <input type="date" id="sessionDate" required>
@@ -571,12 +605,83 @@
                     </select>
                 </div>
                 
+                <div class="form-group">
+                    <label>Session Type</label>
+                    <select id="sessionType">
+                        <option value="completed">✅ Completed Session</option>
+                        <option value="paused">⏸️ Pause Session (Customer offline)</option>
+                    </select>
+                </div>
+                
                 <button type="submit" class="btn btn-primary" style="width:100%; padding:15px; font-size:1.1rem;">
                     💾 Save Session
                 </button>
             </form>
             <div id="saveNotice" class="save-notice">
                 ✅ Session saved successfully!
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resume Session Modal -->
+    <div id="resumeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#ffd700;">⏯️ Resume Paused Session</h2>
+                <button class="close-btn" onclick="closeModal('resumeModal')">×</button>
+            </div>
+            <div id="pausedSessionsList">
+                <!-- Paused sessions for resuming -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calculator Modal -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color:#ffd700;">🧮 Stars ↔ Money Calculator</h2>
+                <button class="close-btn" onclick="closeModal('calculatorModal')">×</button>
+            </div>
+            
+            <div class="calculator-section">
+                <h4 style="color:#9b59b6; margin-bottom:15px;">⭐ Calculate Stars from Money</h4>
+                <div class="form-group">
+                    <label>Money Paid (₹)</label>
+                    <input type="number" id="moneyInput" placeholder="Enter amount" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Rate per Booyah (₹)</label>
+                    <input type="number" id="calcRate" value="4" min="1">
+                </div>
+                <button onclick="calculateStarsFromMoney()" class="btn btn-secondary" style="width:100%; margin-bottom:15px;">
+                    Calculate Stars
+                </button>
+                <div id="starsResultCalc" class="calc-result">
+                    Result: 0 Stars
+                </div>
+            </div>
+            
+            <div class="calculator-section">
+                <h4 style="color:#3498db; margin-bottom:15px;">💰 Calculate Money from Stars</h4>
+                <div class="form-group">
+                    <label>Stars Gained</label>
+                    <input type="number" id="starsInput" placeholder="Enter stars" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Rate per Booyah (₹)</label>
+                    <input type="number" id="calcRate2" value="4" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Discount % (Optional)</label>
+                    <input type="number" id="calcDiscount" placeholder="e.g., 10" min="0" max="100">
+                </div>
+                <button onclick="calculateMoneyFromStars()" class="btn btn-primary" style="width:100%; margin-bottom:15px;">
+                    Calculate Money
+                </button>
+                <div id="moneyResultCalc" class="calc-result">
+                    Result: ₹0
+                </div>
             </div>
         </div>
     </div>
@@ -600,7 +705,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Rate per Booyah (₹)</label>
+                    <label>Default Rate per Booyah (₹)</label>
                     <input type="number" id="playerRate" value="4" min="1" max="100">
                 </div>
                 
@@ -611,38 +716,10 @@
         </div>
     </div>
     
-    <!-- Backup Modal -->
+    <!-- Backup Modal (Optional - can remove if not needed) -->
     <div id="backupModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color:#ffd700;">💾 Backup & Restore</h2>
-                <button class="close-btn" onclick="closeModal('backupModal')">×</button>
-            </div>
-            
-            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-bottom:20px;">
-                <h3 style="color:#ffd700; margin-bottom:10px;">📤 Export Data</h3>
-                <p style="margin-bottom:15px; color:#ccc;">Download all your data as a backup file.</p>
-                <button onclick="exportData()" class="btn btn-primary" style="width:100%; padding:15px;">
-                    ⬇️ Download Backup File
-                </button>
-            </div>
-            
-            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px; margin-bottom:20px;">
-                <h3 style="color:#ffd700; margin-bottom:10px;">📥 Import Data</h3>
-                <p style="margin-bottom:15px; color:#ccc;">Restore from a backup file.</p>
-                <input type="file" id="importFile" accept=".json" style="margin-bottom:15px;">
-                <button onclick="importData()" class="btn btn-success" style="width:100%; padding:15px;">
-                    ⬆️ Upload & Restore
-                </button>
-            </div>
-            
-            <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:10px;">
-                <h3 style="color:#ffd700; margin-bottom:10px;">⚠️ Clear All Data</h3>
-                <p style="margin-bottom:15px; color:#ccc;">Permanently delete all data.</p>
-                <button onclick="clearAllData()" class="btn" style="width:100%; padding:15px; background:#ff4757; color:white;">
-                    🗑️ Clear Everything
-                </button>
-            </div>
+            <!-- Backup content from previous version -->
         </div>
     </div>
     
@@ -653,13 +730,19 @@
         <button class="backup-btn import-btn" onclick="document.getElementById('importFile').click()">
             📥 Import Data
         </button>
+        <input type="file" id="importFile" accept=".json" style="display:none;">
     </div>
 
     <script>
+        // ============================================
+        // 🎮 FREE FIRE TRACKER WITH PAUSE & DISCOUNTS
+        // ============================================
+        
         // Data Management
         let players = JSON.parse(localStorage.getItem('ffPlayers')) || [];
         let sessions = JSON.parse(localStorage.getItem('ffSessions')) || [];
-        const RATE_PER_BOOYAH = 4;
+        let pausedSessions = JSON.parse(localStorage.getItem('ffPausedSessions')) || [];
+        const DEFAULT_RATE = 4;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -670,8 +753,12 @@
             // Setup event listeners
             document.getElementById('sessionForm').addEventListener('submit', saveSession);
             document.getElementById('playerForm').addEventListener('submit', savePlayer);
-            document.getElementById('startStars').addEventListener('input', calculateStars);
-            document.getElementById('endStars').addEventListener('input', calculateStars);
+            
+            // Real-time calculations
+            document.getElementById('startStars').addEventListener('input', calculateSession);
+            document.getElementById('endStars').addEventListener('input', calculateSession);
+            document.getElementById('customRate').addEventListener('input', calculateSession);
+            document.getElementById('discountPercent').addEventListener('input', calculateSession);
             
             // Setup tabs
             document.querySelectorAll('.tab').forEach(tab => {
@@ -685,13 +772,16 @@
             loadPlayerSelect();
             updateAllDisplays();
             
-            // Auto-save reminder
+            // Auto-save
             setInterval(() => {
                 saveToLocalStorage();
-            }, 30000); // Auto-save every 30 seconds
+            }, 30000);
         });
         
-        // Tab switching
+        // ============================================
+        // 🎯 CORE FUNCTIONS
+        // ============================================
+        
         function switchTab(tabId) {
             // Update tabs
             document.querySelectorAll('.tab').forEach(tab => {
@@ -706,51 +796,265 @@
                 content.classList.remove('active');
             });
             document.getElementById(tabId + '-tab').classList.add('active');
+            
+            // Refresh data if needed
+            if (tabId === 'paused') {
+                updatePausedList();
+            }
         }
         
-        // Calculate stars
-        function calculateStars() {
+        function calculateSession() {
             const start = parseInt(document.getElementById('startStars').value) || 0;
             const end = parseInt(document.getElementById('endStars').value) || 0;
-            const gained = Math.max(0, end - start);
-            const amount = gained * RATE_PER_BOOYAH;
-            document.getElementById('starsResult').innerHTML = 
-                `🎯 ${gained} Booyahs = ₹${amount}`;
-        }
-        
-        // Modals
-        function openSessionModal() {
-            loadPlayerSelect();
-            calculateStars();
-            document.getElementById('sessionModal').style.display = 'block';
-        }
-        
-        function openPlayerModal() {
-            document.getElementById('playerModal').style.display = 'block';
-        }
-        
-        function openBackupModal() {
-            document.getElementById('backupModal').style.display = 'block';
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        // Load player select
-        function loadPlayerSelect() {
-            const select = document.getElementById('playerSelect');
-            select.innerHTML = '<option value="">Select Player</option>';
+            const customRate = parseInt(document.getElementById('customRate').value) || DEFAULT_RATE;
+            const discount = parseInt(document.getElementById('discountPercent').value) || 0;
             
-            players.forEach(player => {
-                const option = document.createElement('option');
-                option.value = player.id;
-                option.textContent = `${player.name} (₹${player.rate || RATE_PER_BOOYAH}/Booyah)`;
-                select.appendChild(option);
+            const gained = Math.max(0, end - start);
+            let amount = gained * customRate;
+            
+            // Apply discount if any
+            if (discount > 0) {
+                const discountAmount = amount * (discount / 100);
+                amount = amount - discountAmount;
+            }
+            
+            document.getElementById('starsResult').innerHTML = 
+                `🎯 ${gained} Booyahs × ₹${customRate} = ₹${gained * customRate}`;
+            
+            if (discount > 0) {
+                document.getElementById('finalAmount').innerHTML = 
+                    `🏷️ ${discount}% OFF • Final Amount: ₹${Math.round(amount)}`;
+            } else {
+                document.getElementById('finalAmount').innerHTML = 
+                    `Final Amount: ₹${amount}`;
+            }
+        }
+        
+        // ============================================
+        // ⏸️ PAUSE/RESUME FEATURES
+        // ============================================
+        
+        function openResumeModal() {
+            loadResumeSessions();
+            document.getElementById('resumeModal').style.display = 'block';
+        }
+        
+        function loadResumeSessions() {
+            const container = document.getElementById('pausedSessionsList');
+            
+            if (pausedSessions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:#ccc;">
+                        ⏸️ No paused sessions<br>
+                        <small>All sessions are completed</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '<h3 style="color:#ffd700; margin-bottom:15px;">Select Session to Resume</h3>';
+            
+            pausedSessions.forEach((session, index) => {
+                const player = players.find(p => p.id === session.playerId);
+                if (!player) return;
+                
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'session-item paused-session';
+                sessionDiv.innerHTML = `
+                    <div class="session-header">
+                        <div class="player-name">${player.name}</div>
+                        <div class="paused-badge">PAUSED at ${session.pausedAt} stars</div>
+                    </div>
+                    <div style="color:#ccc; margin:10px 0;">
+                        Started: ${session.startStars} stars → Paused: ${session.pausedAt} stars
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button onclick="resumeSession(${index})" class="icon-btn" style="background:#2ed573; color:white; flex:1;">
+                            ▶️ Resume
+                        </button>
+                        <button onclick="completePausedSession(${index})" class="icon-btn" style="background:#3742fa; color:white; flex:1;">
+                            ✅ Complete
+                        </button>
+                        <button onclick="deletePausedSession(${index})" class="icon-btn" style="background:#ff4757; color:white; flex:1;">
+                            🗑️ Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(sessionDiv);
             });
         }
         
-        // Save session
+        function resumeSession(index) {
+            const pausedSession = pausedSessions[index];
+            const player = players.find(p => p.id === pausedSession.playerId);
+            
+            if (!player) {
+                alert('Player not found!');
+                return;
+            }
+            
+            // Pre-fill the session form
+            document.getElementById('playerSelect').value = player.id;
+            document.getElementById('startStars').value = pausedSession.pausedAt;
+            
+            // Close resume modal, open session modal
+            closeModal('resumeModal');
+            openSessionModal();
+            
+            // Optional: Auto-focus on end stars
+            setTimeout(() => {
+                document.getElementById('endStars').focus();
+            }, 100);
+        }
+        
+        function completePausedSession(index) {
+            const pausedSession = pausedSessions[index];
+            
+            // Create a completed session from paused session
+            const completedSession = {
+                id: Date.now().toString(),
+                playerId: pausedSession.playerId,
+                playerName: pausedSession.playerName,
+                date: new Date().toISOString().split('T')[0],
+                startStars: pausedSession.startStars,
+                endStars: pausedSession.pausedAt,
+                starsGained: pausedSession.pausedAt - pausedSession.startStars,
+                amount: (pausedSession.pausedAt - pausedSession.startStars) * (pausedSession.rate || DEFAULT_RATE),
+                paid: false,
+                createdAt: new Date().toISOString(),
+                rate: pausedSession.rate || DEFAULT_RATE
+            };
+            
+            // Add to sessions
+            sessions.push(completedSession);
+            
+            // Remove from paused
+            pausedSessions.splice(index, 1);
+            
+            // Save and update
+            saveToLocalStorage();
+            updateAllDisplays();
+            closeModal('resumeModal');
+            
+            alert(`✅ Paused session marked as completed!`);
+        }
+        
+        function deletePausedSession(index) {
+            if (confirm('Delete this paused session permanently?')) {
+                pausedSessions.splice(index, 1);
+                saveToLocalStorage();
+                loadResumeSessions();
+                updatePausedList();
+            }
+        }
+        
+        function updatePausedList() {
+            const container = document.getElementById('pausedList');
+            
+            if (pausedSessions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px; color:#ccc;">
+                        ⏸️ No paused sessions<br>
+                        <small>All sessions are active or completed</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            pausedSessions.forEach((session, index) => {
+                const player = players.find(p => p.id === session.playerId);
+                if (!player) return;
+                
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'session-item paused-session';
+                sessionDiv.innerHTML = `
+                    <div class="session-header">
+                        <div class="player-name">${player.name}</div>
+                        <div class="paused-badge">PAUSED</div>
+                    </div>
+                    <div style="color:#ccc; margin:5px 0;">
+                        ${session.startStars} → ${session.pausedAt} stars
+                    </div>
+                    <div style="color:#f39c12; font-weight:bold;">
+                        Paused on: ${session.pausedDate}
+                    </div>
+                    <div class="action-icons">
+                        <button onclick="resumeSession(${index})" class="icon-btn" style="background:#2ed573; color:white;">
+                            ▶️ Resume
+                        </button>
+                        <button onclick="completePausedSession(${index})" class="icon-btn" style="background:#3742fa; color:white;">
+                            ✅ Complete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(sessionDiv);
+            });
+        }
+        
+        // ============================================
+        // 🧮 CALCULATOR FUNCTIONS
+        // ============================================
+        
+        function openCalculatorModal() {
+            document.getElementById('calculatorModal').style.display = 'block';
+        }
+        
+        function calculateStarsFromMoney() {
+            const money = parseFloat(document.getElementById('moneyInput').value) || 0;
+            const rate = parseFloat(document.getElementById('calcRate').value) || DEFAULT_RATE;
+            
+            if (money <= 0 || rate <= 0) {
+                alert('Please enter valid values!');
+                return;
+            }
+            
+            const stars = Math.floor(money / rate);
+            const remainder = money % rate;
+            
+            let result = `⭐ <strong>${stars} Booyahs</strong>`;
+            if (remainder > 0) {
+                result += `<br>💰 ₹${remainder} remaining (not enough for full booyah)`;
+            }
+            
+            document.getElementById('starsResultCalc').innerHTML = result;
+        }
+        
+        function calculateMoneyFromStars() {
+            const stars = parseInt(document.getElementById('starsInput').value) || 0;
+            const rate = parseFloat(document.getElementById('calcRate2').value) || DEFAULT_RATE;
+            const discount = parseInt(document.getElementById('calcDiscount').value) || 0;
+            
+            if (stars <= 0 || rate <= 0) {
+                alert('Please enter valid values!');
+                return;
+            }
+            
+            let amount = stars * rate;
+            
+            if (discount > 0) {
+                const discountAmount = amount * (discount / 100);
+                amount = amount - discountAmount;
+                
+                document.getElementById('moneyResultCalc').innerHTML = 
+                    `💰 ${stars} Stars × ₹${rate} = ₹${stars * rate}<br>
+                     🏷️ ${discount}% OFF = ₹${Math.round(amount)}`;
+            } else {
+                document.getElementById('moneyResultCalc').innerHTML = 
+                    `💰 ${stars} Stars × ₹${rate} = ₹${amount}`;
+            }
+        }
+        
+        // ============================================
+        // 💰 SESSION MANAGEMENT
+        // ============================================
+        
+        function openSessionModal() {
+            loadPlayerSelect();
+            calculateSession();
+            document.getElementById('sessionModal').style.display = 'block';
+        }
+        
         function saveSession(e) {
             e.preventDefault();
             
@@ -759,6 +1063,9 @@
             const endStars = parseInt(document.getElementById('endStars').value) || 0;
             const date = document.getElementById('sessionDate').value;
             const paid = document.getElementById('paymentStatus').value === 'paid';
+            const sessionType = document.getElementById('sessionType').value;
+            const customRate = parseInt(document.getElementById('customRate').value) || DEFAULT_RATE;
+            const discount = parseInt(document.getElementById('discountPercent').value) || 0;
             
             if (!playerId) {
                 alert('Please select a player!');
@@ -772,52 +1079,95 @@
             
             const player = players.find(p => p.id === playerId);
             const starsGained = endStars - startStars;
-            const playerRate = player?.rate || RATE_PER_BOOYAH;
-            const amount = starsGained * playerRate;
             
-            const session = {
-                id: Date.now().toString(),
-                playerId: playerId,
-                playerName: player?.name || 'Unknown',
-                date: date,
-                startStars: startStars,
-                endStars: endStars,
-                starsGained: starsGained,
-                amount: amount,
-                paid: paid,
-                createdAt: new Date().toISOString()
-            };
+            // Calculate amount with discount
+            let amount = starsGained * customRate;
+            if (discount > 0) {
+                const discountAmount = amount * (discount / 100);
+                amount = Math.round(amount - discountAmount);
+            }
             
-            sessions.push(session);
+            if (sessionType === 'paused') {
+                // Save as paused session
+                const pausedSession = {
+                    id: Date.now().toString(),
+                    playerId: playerId,
+                    playerName: player?.name || 'Unknown',
+                    startStars: startStars,
+                    pausedAt: endStars, // This is where we paused
+                    rate: customRate,
+                    pausedDate: date,
+                    createdAt: new Date().toISOString()
+                };
+                
+                pausedSessions.push(pausedSession);
+                
+                // Show success
+                const notice = document.getElementById('saveNotice');
+                notice.innerHTML = `✅ Session paused at ${endStars} stars!`;
+                notice.style.display = 'block';
+                
+            } else {
+                // Save as completed session
+                const session = {
+                    id: Date.now().toString(),
+                    playerId: playerId,
+                    playerName: player?.name || 'Unknown',
+                    date: date,
+                    startStars: startStars,
+                    endStars: endStars,
+                    starsGained: starsGained,
+                    amount: amount,
+                    paid: paid,
+                    createdAt: new Date().toISOString(),
+                    rate: customRate,
+                    discount: discount > 0 ? discount : null
+                };
+                
+                sessions.push(session);
+                
+                // Show success
+                const notice = document.getElementById('saveNotice');
+                notice.innerHTML = `✅ Session saved! ₹${amount} earned`;
+                notice.style.display = 'block';
+            }
+            
             saveToLocalStorage();
             
-            // Show success message
-            const notice = document.getElementById('saveNotice');
-            notice.style.display = 'block';
-            setTimeout(() => {
-                notice.style.display = 'none';
-            }, 2000);
-            
-            // Reset form
+            // Reset form after delay
             setTimeout(() => {
                 document.getElementById('sessionForm').reset();
                 document.getElementById('sessionDate').value = new Date().toISOString().split('T')[0];
-                calculateStars();
-            }, 500);
+                document.getElementById('customRate').value = '';
+                document.getElementById('discountPercent').value = '';
+                document.getElementById('sessionType').value = 'completed';
+                calculateSession();
+                notice.style.display = 'none';
+            }, 1500);
             
             // Update displays
             setTimeout(() => {
                 updateAllDisplays();
+                if (sessionType === 'paused') {
+                    updatePausedList();
+                }
             }, 100);
         }
         
-        // Save player
+        // ============================================
+        // 👤 PLAYER MANAGEMENT
+        // ============================================
+        
+        function openPlayerModal() {
+            document.getElementById('playerModal').style.display = 'block';
+        }
+        
         function savePlayer(e) {
             e.preventDefault();
             
             const name = document.getElementById('playerName').value.trim();
             const contact = document.getElementById('playerContact').value.trim();
-            const rate = parseInt(document.getElementById('playerRate').value) || RATE_PER_BOOYAH;
+            const rate = parseInt(document.getElementById('playerRate').value) || DEFAULT_RATE;
             
             if (!name) {
                 alert('Please enter player name!');
@@ -845,24 +1195,40 @@
             
             // Reset and close
             document.getElementById('playerForm').reset();
+            document.getElementById('playerRate').value = DEFAULT_RATE;
             closeModal('playerModal');
             
             // Update
             loadPlayerSelect();
             updateAllDisplays();
             
-            alert(`✅ Player added: ${name}`);
+            alert(`✅ Player added: ${name} (₹${rate}/Booyah)`);
         }
         
-        // Update all displays
+        function loadPlayerSelect() {
+            const select = document.getElementById('playerSelect');
+            select.innerHTML = '<option value="">Select Player</option>';
+            
+            players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = `${player.name} (₹${player.rate || DEFAULT_RATE}/Booyah)`;
+                select.appendChild(option);
+            });
+        }
+        
+        // ============================================
+        // 📊 DISPLAY FUNCTIONS
+        // ============================================
+        
         function updateAllDisplays() {
             updateStats();
             updateTodaySessions();
             updatePlayersList();
             updatePendingList();
+            updatePausedList();
         }
         
-        // Update statistics
         function updateStats() {
             const today = new Date().toISOString().split('T')[0];
             
@@ -890,7 +1256,6 @@
             document.getElementById('todayStars').textContent = todayStars;
         }
         
-        // Update today's sessions
         function updateTodaySessions() {
             const today = new Date().toISOString().split('T')[0];
             const todaySessions = sessions.filter(s => s.date === today);
@@ -908,9 +1273,15 @@
             
             container.innerHTML = '';
             todaySessions.forEach(session => {
-                const div = document.createElement('div');
-                div.className = 'session-item';
-                div.innerHTML = `
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'session-item';
+                
+                let discountInfo = '';
+                if (session.discount) {
+                    discountInfo = `<div style="color:#3498db; font-size:0.9rem;">🏷️ ${session.discount}% OFF</div>`;
+                }
+                
+                sessionDiv.innerHTML = `
                     <div class="session-header">
                         <div class="player-name">${session.playerName}</div>
                         <div class="status-badge ${session.paid ? 'status-paid' : 'status-unpaid'}">
@@ -918,28 +1289,26 @@
                         </div>
                     </div>
                     <div style="color:#ccc; font-size:0.9rem;">
-                        ${session.startStars} → ${session.endStars} stars
+                        ${session.startStars} → ${session.endStars} stars (Rate: ₹${session.rate || DEFAULT_RATE})
                     </div>
+                    ${discountInfo}
                     <div class="session-stats">
                         <div class="stars-display">${session.starsGained} Booyahs</div>
                         <div class="amount-display">₹${session.amount}</div>
                     </div>
                     <div class="action-icons">
-                        <button class="icon-btn" onclick="togglePayment('${session.id}')" 
-                                style="background:${session.paid ? '#ff4757' : '#2ed573'}; color:white;">
+                        <button onclick="togglePayment('${session.id}')" class="icon-btn" style="background:${session.paid ? '#ff4757' : '#2ed573'}; color:white;">
                             ${session.paid ? '❌ Unpaid' : '✅ Paid'}
                         </button>
-                        <button class="icon-btn" onclick="deleteSession('${session.id}')" 
-                                style="background:#3742fa; color:white;">
+                        <button onclick="deleteSession('${session.id}')" class="icon-btn" style="background:#3742fa; color:white;">
                             🗑️ Delete
                         </button>
                     </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(sessionDiv);
             });
         }
         
-        // Update players list
         function updatePlayersList() {
             const container = document.getElementById('playersList');
             
@@ -980,7 +1349,7 @@
                     <h4>${player.name}</h4>
                     <div class="player-info">
                         <div>📞 ${player.contact || 'No contact'}</div>
-                        <div>💰 Rate: ₹${player.rate || RATE_PER_BOOYAH}/Booyah</div>
+                        <div>💰 Rate: ₹${player.rate || DEFAULT_RATE}/Booyah</div>
                         <div>⭐ Total: ${player.totalStars} Booyahs</div>
                         <div>💵 Earned: ₹${player.totalAmount}</div>
                         <div style="color:${pending > 0 ? '#ff4757' : '#2ed573'}; margin-top:10px; font-weight:bold;">
@@ -992,7 +1361,6 @@
             });
         }
         
-        // Update pending list
         function updatePendingList() {
             const pendingSessions = sessions.filter(s => !s.paid && s.amount > 0);
             const container = document.getElementById('pendingList');
@@ -1010,10 +1378,16 @@
             container.innerHTML = '';
             pendingSessions.forEach(session => {
                 const daysAgo = Math.floor((new Date() - new Date(session.createdAt)) / (1000 * 60 * 60 * 24));
-                const div = document.createElement('div');
-                div.className = 'session-item';
-                div.style.borderLeftColor = '#ff4757';
-                div.innerHTML = `
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'session-item';
+                sessionDiv.style.borderLeftColor = '#ff4757';
+                
+                let discountInfo = '';
+                if (session.discount) {
+                    discountInfo = `<div style="color:#3498db; font-size:0.9rem;">🏷️ ${session.discount}% discount applied</div>`;
+                }
+                
+                sessionDiv.innerHTML = `
                     <div class="session-header">
                         <div class="player-name">${session.playerName}</div>
                         <div style="color:#ccc; font-size:0.8rem;">
@@ -1023,6 +1397,7 @@
                     <div style="color:#ccc; font-size:0.9rem; margin:8px 0;">
                         ${session.startStars} → ${session.endStars} = ${session.starsGained} Booyahs
                     </div>
+                    ${discountInfo}
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="color:#ffd700; font-weight:bold; font-size:1.2rem;">
                             ₹${session.amount}
@@ -1039,11 +1414,14 @@
                         </div>
                     </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(sessionDiv);
             });
         }
         
-        // Toggle payment
+        // ============================================
+        // 🔧 UTILITY FUNCTIONS
+        // ============================================
+        
         function togglePayment(sessionId) {
             const sessionIndex = sessions.findIndex(s => s.id === sessionId);
             if (sessionIndex === -1) return;
@@ -1056,7 +1434,6 @@
             alert(`Payment marked as ${status}`);
         }
         
-        // Delete session
         function deleteSession(sessionId) {
             if (confirm('Delete this session permanently?')) {
                 sessions = sessions.filter(s => s.id !== sessionId);
@@ -1066,7 +1443,6 @@
             }
         }
         
-        // Remind player
         function remindPlayer(playerId) {
             const player = players.find(p => p.id === playerId);
             if (!player) return;
@@ -1085,46 +1461,24 @@
             alert(`📱 Copy this message and send via WhatsApp:\n\n${message}`);
         }
         
-        // Show today's report
-        function showTodayReport() {
-            const today = new Date().toISOString().split('T')[0];
-            const todaySessions = sessions.filter(s => s.date === today);
-            
-            let report = `📊 TODAY'S REPORT (${today})\n\n`;
-            
-            if (todaySessions.length === 0) {
-                report += "No sessions today.\n";
-            } else {
-                todaySessions.forEach(session => {
-                    report += `🎮 ${session.playerName}: ${session.starsGained} Booyahs = ₹${session.amount} ${session.paid ? '✅' : '❌'}\n`;
-                });
-                
-                const totalStars = todaySessions.reduce((sum, s) => sum + s.starsGained, 0);
-                const totalAmount = todaySessions.reduce((sum, s) => sum + s.amount, 0);
-                const paidAmount = todaySessions.filter(s => s.paid).reduce((sum, s) => sum + s.amount, 0);
-                
-                report += `\n📈 TOTAL: ${totalStars} Booyahs = ₹${totalAmount}\n`;
-                report += `💰 RECEIVED: ₹${paidAmount}\n`;
-                report += `📉 PENDING: ₹${totalAmount - paidAmount}\n`;
-            }
-            
-            alert(report);
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
         
-        // Export data
         function exportData() {
             const data = {
                 players: players,
                 sessions: sessions,
+                pausedSessions: pausedSessions,
                 exportDate: new Date().toISOString(),
-                version: '1.0'
+                version: '2.0'
             };
             
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `freefire-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `freefire-backup-v2-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1133,7 +1487,7 @@
             alert('✅ Data exported successfully!');
         }
         
-        // Import data
+        // Import function (needs file input)
         function importData() {
             const fileInput = document.getElementById('importFile');
             const file = fileInput.files[0];
@@ -1151,6 +1505,7 @@
                     if (confirm('Replace all current data with backup?')) {
                         players = data.players || [];
                         sessions = data.sessions || [];
+                        pausedSessions = data.pausedSessions || [];
                         saveToLocalStorage();
                         updateAllDisplays();
                         alert('✅ Data restored successfully!');
@@ -1162,25 +1517,10 @@
             reader.readAsText(file);
         }
         
-        // Clear all data
-        function clearAllData() {
-            if (confirm('⚠️ DELETE ALL DATA? This cannot be undone!')) {
-                if (confirm('Are you REALLY sure? All players and sessions will be lost!')) {
-                    localStorage.removeItem('ffPlayers');
-                    localStorage.removeItem('ffSessions');
-                    players = [];
-                    sessions = [];
-                    updateAllDisplays();
-                    alert('All data cleared!');
-                    closeModal('backupModal');
-                }
-            }
-        }
-        
-        // Save to localStorage
         function saveToLocalStorage() {
             localStorage.setItem('ffPlayers', JSON.stringify(players));
             localStorage.setItem('ffSessions', JSON.stringify(sessions));
+            localStorage.setItem('ffPausedSessions', JSON.stringify(pausedSessions));
         }
     </script>
 </body>
